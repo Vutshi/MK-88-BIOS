@@ -677,6 +677,8 @@
                              K4                                         XREF[2]:  f000:d3ca(c), 
                                                                                  Keyboard_IO:f000:e854(c)  
    f000:d340       ADD        BX,0x2                                   ; MOVE TO NEXT WORD IN LIST
+   ****   The following line reads CMP BX,0x30 in BIOS v3.90 which seems 
+   ****   to be fixed later in v3.92 where it reads as follows:
    f000:d343       CMP        BX,0x3e                                  ; AT END OF BUFFER?
    f000:d347       JNZ        K5
    f000:d349       MOV        BX,0x1e                                  ; YES, RESET TO BUFFER BEGINNING

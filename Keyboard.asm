@@ -1,3 +1,398 @@
+                             VECTOR_TABLE
+   f000:fef3     dw         FEA5h
+   f000:fef5     dw         E987h                                   ; INTERRUPT 9
+   f000:fef7     dw         FF23h                                   ; D11
+   f000:fef9     dw         D100h                                   ; IRQ3 Keyboard_MK88
+   f000:fefb     dw         FF23h                                   ; D11
+   f000:fefd     dw         FF23h                                   ; D11
+   f000:feff     dw         EF57h                                   ; DISK_INT
+   f000:ff01     dw         FF23h                                   ; D11
+   f000:ff03     dw         F065h                                   ; VIDEO_IO
+   f000:ff05     dw         F84Dh                                   ; EQUIPMENT
+   f000:ff07     dw         F841h                                   ; MEMORY_SIZE_DET
+   f000:ff09     dw         EC59h                                   ; DISKETTE_IO
+   f000:ff0b     dw         E739h                                   ; RS232_IO
+   f000:ff0d     dw         F859h                                   ; CASSETTE_IO
+   f000:ff0f     dw         E82Eh                                   ; INTERRUPT 16H
+   f000:ff11     dw         EFD2h                                   ; PRINTER_IO
+   f000:ff13     dw         C003h                                   ; INTERRUPT 18H (GO TO RESIDENT 
+   f000:ff15     dw         E6F2h                                   ; BOOT_STRAP
+   f000:ff17     dw         FE6Eh                                   ; TIME_OF_DAY
+   f000:ff19     dw         FF53h                                   ; DUMMY_RETURN
+   f000:ff1b     dw         FF53h                                   ; DUMMY_RETURN
+   f000:ff1d     dw         F0A4h                                   ; VIDEO_PARMS
+   f000:ff1f     dw         EFC7h                                   ; OFFSET DISK_BASE, Interrupt 1Eh
+   f000:ff21     dw         C90Ch
+
+
+
+                             **************************************************************
+                             *                          FUNCTION                          *
+                             **************************************************************
+                             undefined Keyboard_MK88()
+             undefined         AL:1           <RETURN>
+                             Keyboard_MK88                              XREF[1]:  f000:fef9(*)  
+   f000:d100     PUSH       AX
+   f000:d101     PUSH       BX
+   f000:d102     PUSH       CX
+   f000:d103     PUSH       DX
+   f000:d104     PUSH       SI
+   f000:d105     PUSH       DS
+   f000:d106     MOV        AX,0x40
+   f000:d109     MOV        DS,AX
+   f000:d10b     MOV        SI,0x3e
+   f000:d10e     MOV        BH,14
+                             LAB_f000_d110                              XREF[2]:  f000:d125(j), f000:d139(j)  
+   f000:d110     DEC        SI
+   f000:d111     DEC        BH
+   f000:d113     CMP        BH,0x0
+   f000:d116     JGE        LAB_f000_d11b
+   f000:d118     JMP        LAB_f000_d1a0
+                             LAB_f000_d11b                              XREF[1]:  f000:d116(j)  
+   f000:d11b     MOV        AL,BH
+   f000:d11d     OUT        0x62,AL
+   f000:d11f     IN         AL,0xc0                                 ; (probably) Read data bus
+   f000:d121     MOV        DL,byte ptr [SI]=>DAT_0000_043d
+   f000:d123     CMP        AL,DL
+   f000:d125     JZ         LAB_f000_d110
+   f000:d127     MOV        byte ptr [SI]=>DAT_0000_043d,AL
+   f000:d129     MOV        DH,DL
+   f000:d12b     XOR        DH,AL
+   f000:d12d     MOV        BL,0x7
+                             LAB_f000_d12f                              XREF[1]:  f000:d137(j)  
+   f000:d12f     ROL        AL,0x1
+   f000:d131     ROL        DH,0x1
+   f000:d133     JC         LAB_f000_d13b
+   f000:d135     DEC        BL
+   f000:d137     JGE        LAB_f000_d12f
+   f000:d139     JMP        LAB_f000_d110
+                             LAB_f000_d13b                              XREF[1]:  f000:d133(j)  
+   f000:d13b     AND        AL,0x1
+   f000:d13d     JZ         LAB_f000_d144
+   f000:d13f     MOV        AH,0x1
+   f000:d141     JMP        LAB_f000_d146
+   f000:d143     NOP
+                             LAB_f000_d144                              XREF[1]:  f000:d13d(j)  
+   f000:d144     MOV        AH,0x0
+                             LAB_f000_d146                              XREF[1]:  f000:d141(j)  
+   f000:d146     SHL        BH,0x1
+   f000:d148     SHL        BH,0x1
+   f000:d14a     SHL        BH,0x1
+   f000:d14c     ADD        BL,BH
+   f000:d14e     MOV        AL,BL
+   f000:d150     CMP        AL,0x20
+   f000:d152     JBE        LAB_f000_d157
+   f000:d154     JMP        LAB_f000_d2d9
+                             LAB_f000_d157                              XREF[1]:  f000:d152(j)  
+   f000:d157     CMP        AL,0xd
+   f000:d159     JBE        LAB_f000_d1ac
+   f000:d15b     JMP        LAB_f000_d24f
+                             LAB_f000_d15e                              XREF[2]:  f000:d2d3(j), f000:d2f1(j)  
+   f000:d15e     SUB        AL,0x21
+   f000:d160     MOV        BX,0xd4e0
+   f000:d163     XLAT       CS:BX=>DAT_0000_d52e
+                             LAB_f000_d165                              XREF[2]:  f000:d267(j), f000:d2bc(j)  
+   f000:d165     CMP        AH,0x0
+   f000:d168     JZ         LAB_f000_d16c
+   f000:d16a     OR         AL,0x80
+                             LAB_f000_d16c                              XREF[1]:  f000:d168(j)  
+   f000:d16c     OUT        0x60,AL
+   f000:d16e     INT        0x9                                     ; call IBM INT 9
+   f000:d170     IN         AL,0x61
+   f000:d172     TEST       byte ptr [offset KB_FLAG],0x40
+   f000:d177     JZ         LAB_f000_d17d
+   f000:d179     OR         AL,0x10
+   f000:d17b     JMP        LAB_f000_d17f
+                             LAB_f000_d17d                              XREF[1]:  f000:d177(j)  
+   f000:d17d     AND        AL,0xef
+                             LAB_f000_d17f                              XREF[1]:  f000:d17b(j)  
+   f000:d17f     TEST       byte ptr [offset KB_FLAG],0x20
+   f000:d184     JZ         LAB_f000_d18b
+   f000:d186     OR         AL,0x8
+   f000:d188     JMP        LAB_f000_d18d
+   f000:d18a     NOP
+                             LAB_f000_d18b                              XREF[1]:  f000:d184(j)  
+   f000:d18b     AND        AL,0xf7
+                             LAB_f000_d18d                              XREF[1]:  f000:d188(j)  
+   f000:d18d     TEST       byte ptr [offset KB_FLAG_1],0x1
+   f000:d192     JNZ        LAB_f000_d199
+   f000:d194     OR         AL,0x4
+   f000:d196     JMP        LAB_f000_d19b
+   f000:d198     NOP
+                             LAB_f000_d199                              XREF[1]:  f000:d192(j)  
+   f000:d199     AND        AL,0xfb
+                             LAB_f000_d19b                              XREF[1]:  f000:d196(j)  
+   f000:d19b     OUT        0x61,AL
+   f000:d19d     JMP        LAB_f000_d1a5
+   f000:d19f     NOP
+                             LAB_f000_d1a0                              XREF[4]:  f000:d118(j), f000:d280(j), 
+                                                                                 f000:d287(j), f000:d2d6(j)  
+   f000:d1a0     CLI
+   f000:d1a1     MOV        AL,0x20
+   f000:d1a3     OUT        0x20,AL
+                             LAB_f000_d1a5                              XREF[2]:  f000:d19d(j), f000:d2b0(j)  
+   f000:d1a5     POP        DS
+   f000:d1a6     POP        SI
+   f000:d1a7     POP        DX
+   f000:d1a8     POP        CX
+   f000:d1a9     POP        BX
+   f000:d1aa     POP        AX
+   f000:d1ab     IRET
+                             LAB_f000_d1ac                              XREF[1]:  f000:d159(j)  
+   f000:d1ac     MOV        CH,0x0
+   f000:d1ae     PUSH       word ptr [offset KB_FLAG]
+   f000:d1b2     OR         byte ptr [offset KB_FLAG_1],0x2
+   f000:d1b7     TEST       byte ptr [offset KB_FLAG],0x4
+   f000:d1bc     JZ         LAB_f000_d1c6
+   f000:d1be     MOV        BX,0xd4b2
+   f000:d1c1     XLAT       CS:BX=>DAT_0000_d521
+   f000:d1c3     JMP        LAB_f000_d2a1
+                             LAB_f000_d1c6                              XREF[1]:  f000:d1bc(j)  
+   f000:d1c6     TEST       byte ptr [offset KB_FLAG],0x8
+   f000:d1cb     JZ         LAB_f000_d1d5
+   f000:d1cd     MOV        BX,0xd4c0
+   f000:d1d0     XLAT       CS:BX=>DAT_0000_d52f
+   f000:d1d2     JMP        LAB_f000_d2a1
+                             LAB_f000_d1d5                              XREF[1]:  f000:d1cb(j)  
+   f000:d1d5     TEST       byte ptr [offset KB_FLAG],0x3
+   f000:d1da     JZ         LAB_f000_d200
+   f000:d1dc     MOV        CL,AL
+   f000:d1de     INC        CX
+   f000:d1df     MOV        DX,word ptr CS:[DAT_f000_d4b0]          ; = C004h
+   f000:d1e4     MOV        BL,0x3
+                             LAB_f000_d1e6                              XREF[1]:  f000:d1e8(j)  
+   f000:d1e6     ROL        DX,0x1
+   f000:d1e8     LOOP       LAB_f000_d1e6
+   f000:d1ea     JC         LAB_f000_d1f4
+   f000:d1ec     NOT        BL
+   f000:d1ee     AND        byte ptr [offset KB_FLAG],BL
+   f000:d1f2     JMP        LAB_f000_d1f8
+                             LAB_f000_d1f4                              XREF[1]:  f000:d1ea(j)  
+   f000:d1f4     OR         byte ptr [offset KB_FLAG],BL
+                             LAB_f000_d1f8                              XREF[1]:  f000:d1f2(j)  
+   f000:d1f8     MOV        BX,0xd49e
+   f000:d1fb     XLAT       CS:BX=>DAT_0000_d50d
+   f000:d1fd     JMP        LAB_f000_d2a1
+                             LAB_f000_d200                              XREF[1]:  f000:d1da(j)  
+   f000:d200     TEST       byte ptr [offset KB_FLAG_1],0x4
+   f000:d205     JZ         LAB_f000_d22b
+   f000:d207     MOV        CL,AL
+   f000:d209     INC        CX
+   f000:d20a     MOV        DX,word ptr CS:[DAT_f000_d4ae]          ; = 78E0h
+   f000:d20f     MOV        BL,0x3
+                             LAB_f000_d211                              XREF[1]:  f000:d213(j)  
+   f000:d211     ROL        DX,0x1
+   f000:d213     LOOP       LAB_f000_d211
+   f000:d215     JC         LAB_f000_d21f
+   f000:d217     NOT        BL
+   f000:d219     AND        byte ptr [offset KB_FLAG],BL
+   f000:d21d     JMP        LAB_f000_d223
+                             LAB_f000_d21f                              XREF[1]:  f000:d215(j)  
+   f000:d21f     OR         byte ptr [offset KB_FLAG],BL
+                             LAB_f000_d223                              XREF[1]:  f000:d21d(j)  
+   f000:d223     MOV        BX,0xd490
+   f000:d226     XLAT       CS:BX=>DAT_0000_d4ff
+   f000:d228     JMP        LAB_f000_d2a1
+   f000:d22a     NOP
+                             LAB_f000_d22b                              XREF[1]:  f000:d205(j)  
+   f000:d22b     MOV        CL,AL
+   f000:d22d     INC        CX
+   f000:d22e     MOV        DX,word ptr CS:[DAT_f000_d4ac]          ; = E478h
+   f000:d233     MOV        BL,0x3
+                             LAB_f000_d235                              XREF[1]:  f000:d237(j)  
+   f000:d235     ROL        DX,0x1
+   f000:d237     LOOP       LAB_f000_d235
+   f000:d239     JC         LAB_f000_d243
+   f000:d23b     NOT        BL
+   f000:d23d     AND        byte ptr [offset KB_FLAG],BL
+   f000:d241     JMP        LAB_f000_d247
+                             LAB_f000_d243                              XREF[1]:  f000:d239(j)  
+   f000:d243     OR         byte ptr [offset KB_FLAG],BL
+                             LAB_f000_d247                              XREF[1]:  f000:d241(j)  
+   f000:d247     MOV        BX,0xd482
+   f000:d24a     XLAT       CS:BX=>DAT_0000_d4f1
+   f000:d24c     JMP        LAB_f000_d2a1
+   f000:d24e     NOP
+                             LAB_f000_d24f                              XREF[1]:  f000:d15b(j)  
+   f000:d24f     CMP        AL,0x19
+   f000:d251     JNZ        LAB_f000_d261
+   f000:d253     MOV        AL,0x9
+   f000:d255     PUSH       word ptr [offset KB_FLAG]
+   f000:d259     MOV        byte ptr [offset KB_FLAG],0x1
+   f000:d25e     JMP        LAB_f000_d2a1
+   f000:d260     NOP
+                             LAB_f000_d261                              XREF[1]:  f000:d251(j)  
+   f000:d261     CMP        AL,0x1b
+   f000:d263     JNZ        LAB_f000_d26a
+   f000:d265     MOV        AL,0x1c
+   f000:d267     JMP        LAB_f000_d165
+                             LAB_f000_d26a                              XREF[1]:  f000:d263(j)  
+   f000:d26a     CMP        AL,0x1a
+   f000:d26c     JNZ        LAB_f000_d27c
+   f000:d26e     MOV        AL,0x35
+   f000:d270     PUSH       word ptr [offset KB_FLAG]
+   f000:d274     MOV        byte ptr [offset KB_FLAG],0x0
+   f000:d279     JMP        LAB_f000_d2a1
+   f000:d27b     NOP
+                             LAB_f000_d27c                              XREF[1]:  f000:d26c(j)  
+   f000:d27c     CMP        AL,0x1c
+   f000:d27e     JNZ        LAB_f000_d283
+   f000:d280     JMP        LAB_f000_d1a0
+                             LAB_f000_d283                              XREF[1]:  f000:d27e(j)  
+   f000:d283     CMP        AL,0x1d
+   f000:d285     JNZ        LAB_f000_d28a
+   f000:d287     JMP        LAB_f000_d1a0
+                             LAB_f000_d28a                              XREF[1]:  f000:d285(j)  
+   f000:d28a     CMP        AL,0x1f
+   f000:d28c     JA         LAB_f000_d2b3
+   f000:d28e     MOV        BX,0xd4ce
+   f000:d291     SUB        AL,0xe
+   f000:d293     XLAT       CS:BX=>DAT_0000_d52f
+   f000:d295     PUSH       word ptr [offset KB_FLAG]
+   f000:d299     AND        byte ptr [offset KB_FLAG],0xdf
+   f000:d29e     JMP        LAB_f000_d2a1
+   f000:d2a0     NOP
+                             LAB_f000_d2a1                              XREF[9]:  f000:d1c3(j), f000:d1d2(j), 
+                                                                                 f000:d1fd(j), f000:d228(j), 
+                                                                                 f000:d24c(j), f000:d25e(j), 
+                                                                                 f000:d279(j), f000:d29e(j), 
+                                                                                 f000:d2ca(j)  
+   f000:d2a1     CMP        AH,0x0
+   f000:d2a4     JZ         LAB_f000_d2a8
+   f000:d2a6     OR         AL,0x80
+                             LAB_f000_d2a8                              XREF[1]:  f000:d2a4(j)  
+   f000:d2a8     OUT        0x60,AL
+   f000:d2aa     INT        0x9                                     ; Call IBM INT 9
+   f000:d2ac     POP        word ptr [offset KB_FLAG]
+   f000:d2b0     JMP        LAB_f000_d1a5
+                             LAB_f000_d2b3                              XREF[1]:  f000:d28c(j)  
+   f000:d2b3     TEST       byte ptr [offset KB_FLAG],0x4
+   f000:d2b8     JZ         LAB_f000_d2bf
+   f000:d2ba     MOV        AL,0x46
+   f000:d2bc     JMP        LAB_f000_d165
+                             LAB_f000_d2bf                              XREF[1]:  f000:d2b8(j)  
+   f000:d2bf     MOV        AL,0x45
+   f000:d2c1     PUSH       word ptr [offset KB_FLAG]
+   f000:d2c5     OR         byte ptr [offset KB_FLAG],0x4
+   f000:d2ca     JMP        LAB_f000_d2a1
+                             LAB_f000_d2cc                              XREF[6]:  f000:d2db(j), f000:d2df(j), 
+                                                                                 f000:d2e3(j), f000:d2e7(j), 
+                                                                                 f000:d2eb(j), f000:d2ef(j)  
+   f000:d2cc     TEST       byte ptr [offset KB_FLAG_1],0x2
+   f000:d2d1     JNZ        LAB_f000_d2d6
+   f000:d2d3     JMP        LAB_f000_d15e
+                             LAB_f000_d2d6                              XREF[1]:  f000:d2d1(j)  
+   f000:d2d6     JMP        LAB_f000_d1a0
+                             LAB_f000_d2d9                              XREF[1]:  f000:d154(j)  
+   f000:d2d9     CMP        AL,0x4a
+   f000:d2db     JZ         LAB_f000_d2cc
+   f000:d2dd     CMP        AL,0x4b
+   f000:d2df     JZ         LAB_f000_d2cc
+   f000:d2e1     CMP        AL,0x55
+   f000:d2e3     JZ         LAB_f000_d2cc
+   f000:d2e5     CMP        AL,0x56
+   f000:d2e7     JZ         LAB_f000_d2cc
+   f000:d2e9     CMP        AL,0x5e
+   f000:d2eb     JZ         LAB_f000_d2cc
+   f000:d2ed     CMP        AL,0x5f
+   f000:d2ef     JZ         LAB_f000_d2cc
+   f000:d2f1     JMP        LAB_f000_d15e
+   f000:d2f4     ??         1Bh
+   f000:d2f5     ??         21h    !
+   f000:d2f6     ??         40h    @
+   f000:d2f7     ??         23h    #
+   f000:d2f8     ??         24h    $
+   f000:d2f9     ??         25h    %
+   f000:d2fa     ??         5Eh    ^
+   f000:d2fb     ??         26h    &
+   f000:d2fc     ??         2Ah    *
+   f000:d2fd     ??         28h    (
+   f000:d2fe     ??         29h    )
+   f000:d2ff     ??         5Fh    _
+   f000:d300     ??         2Bh    +
+   f000:d301     ??         08h
+   f000:d302     ??         00h
+   f000:d303     ??         B9h
+   f000:d304     ??         C6h
+   f000:d305     ??         C3h
+   f000:d306     ??         BAh
+   f000:d307     ??         B5h
+   f000:d308     ??         BDh
+   f000:d309     ??         B3h
+   f000:d30a     ??         C8h
+   f000:d30b     ??         C9h
+   f000:d30c     ??         B7h
+   f000:d30d     ??         B6h
+   f000:d30e     ??         CDh
+   f000:d30f     ??         0Dh
+   f000:d310     ??         FFh
+   f000:d311     ??         C4h
+   f000:d312     ??         CBh
+   f000:d313     ??         B2h
+   f000:d314     ??         B0h
+   f000:d315     ??         BFh
+   f000:d316     ??         C0h
+   f000:d317     ??         BEh
+   f000:d318     ??         BBh
+   f000:d319     ??         B4h
+   f000:d31a     ??         27h    '
+   f000:d31b     ??         22h    "
+   f000:d31c     ??         B1h
+   f000:d31d     ??         CEh
+   f000:d31e     ??         7Ch    |
+   f000:d31f     ??         CFh
+   f000:d320     ??         C7h
+   f000:d321     ??         C1h
+   f000:d322     ??         BCh
+   f000:d323     ??         B8h
+   f000:d324     ??         C2h
+   f000:d325     ??         CCh
+   f000:d326     ??         3Ch    <
+   f000:d327     ??         3Eh    >
+   f000:d328     ??         3Fh    ?
+   f000:d329     ??         C5h
+   f000:d32a     ??         00h
+   f000:d32b     ??         FFh
+   f000:d32c     ??         20h     
+   f000:d32d     ??         CAh
+   f000:d32e     ??         FFh
+   f000:d32f     ??         FFh
+   f000:d330     ??         FFh
+   f000:d331     ??         FFh
+   f000:d332     ??         FFh
+   f000:d333     ??         FFh
+   f000:d334     ??         FFh
+   f000:d335     ??         FFh
+   f000:d336     ??         FFh
+   f000:d337     ??         FFh
+   f000:d338     ??         FFh
+   f000:d339     ??         FFh
+   f000:d33a     ??         FFh
+   f000:d33b     ??         FFh
+   f000:d33c     ??         FFh
+   f000:d33d     ??         FFh
+   f000:d33e     ??         FFh
+   f000:d33f     ??         FFh
+                             **************************************************************
+                             *                          FUNCTION                          *
+                             **************************************************************
+                             undefined __cdecl16near K4(void)
+             undefined         AL:1           <RETURN>
+                             ;------------------------------------------------------------
+                             ;       INCREMENT BUFFER POINTER ROUTINE                     
+                             ;------------------------------------------------------------
+                             K4                                         XREF[2]:  f000:d3ca(c), 
+                                                                                 Keyboard_IO:f000:e854(c)  
+   f000:d340     ADD        BX,0x2                                  ; MOVE TO NEXT WORD IN LIST
+   f000:d343     CMP        BX,0x30                                 ; AT END OF BUFFER?
+   f000:d347     JNZ        K5
+   f000:d349     MOV        BX,0x1e                                 ; YES, RESET TO BUFFER BEGINNING
+                             K5                                         XREF[1]:  f000:d347(j)  
+   f000:d34c     RET
+
+
+
+
                              **************************************************************
                              *                          FUNCTION                          *
                              **************************************************************
@@ -7,7 +402,7 @@
    f000:e82e       STI
    f000:e82f       PUSH       DS
    f000:e830       PUSH       BX
-   f000:e831       MOV        BX,0x40
+   f000:e831       MOV        BX,0x40 
    f000:e834       MOV        DS,BX
    f000:e836       OR         AH,AH
    f000:e838       JZ         K1
@@ -666,24 +1061,6 @@
    
    
    
-                             **************************************************************
-                             *                          FUNCTION                          *
-                             **************************************************************
-                             undefined __cdecl16near K4(void)
-             undefined         AL:1           <RETURN>
-                             ;------------------------------------------------------------
-                             ;       INCREMENT BUFFER POINTER ROUTINE                     
-                             ;------------------------------------------------------------
-                             K4                                         XREF[2]:  f000:d3ca(c), 
-                                                                                 Keyboard_IO:f000:e854(c)  
-   f000:d340       ADD        BX,0x2                                   ; MOVE TO NEXT WORD IN LIST
-   ;****   The following line reads CMP BX,0x30 in BIOS v3.90 which seems 
-   ;****   to be fixed later in v3.92 where it reads as follows:
-   f000:d343       CMP        BX,0x3e                                  ; AT END OF BUFFER?
-   f000:d347       JNZ        K5
-   f000:d349       MOV        BX,0x1e                                  ; YES, RESET TO BUFFER BEGINNING
-                             K5                                         XREF[1]:  f000:d347(j)  
-   f000:d34c       RET
                              **************************************************************
                              *                          FUNCTION                          *
                              **************************************************************
